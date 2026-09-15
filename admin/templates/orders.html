@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Buyurtmalar — Admin panel{% endblock %}
+{% block content %}
+  <div class="page-header">
+    <div>
+      <h1>Buyurtmalar</h1>
+      <p>{{ orders|length }} ta buyurtma {{ 'holat: ' + current_status if current_status else '' }}</p>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <a class="filter-chip {{ 'active' if not current_status }}" href="{{ url_for('orders') }}">Barchasi</a>
+    {% for s in statuses %}
+      <a class="filter-chip {{ 'active' if current_status == s }}" href="{{ url_for('orders', status=s) }}">{{ s }}</a>
+    {% endfor %}
+  </div>
+
+  {% if orders %}
+    {% for o in orders %}
+      <div class="order-card">
+        <div class="order-top">
+          <div>
+            <div class="order-id">Buyurtma #{{ o.id }}</div>
+            <div class="order-meta">{{ o.customer_name }} · {{ o.phone }} · {{ o.created_at.strftime('%d.%m.%Y %H:%M') }}</div>
+            <div class="order-meta">📍 {{ o.address }}</div>
+          </div>
+          <form method="post" action="{{ url_for('order_update_status', order_id=o.id) }}">
+            <select name="status" class="status-select" onchange="this.form.submit()">
+              {% set status_emoji = {'yangi': '🆕', 'tasdiqlandi': '📦', 'yetkazildi': '✅', 'bekor_qilindi': '❌'} %}
+              {% for s in statuses %}
+                <option value="{{ s }}" {{ 'selected' if o.status == s else '' }}>{{ status_emoji.get(s, '') }} {{ s }}</option>
+              {% endfor %}
+            </select>
+          </form>
+        </div>
+        <div class="order-items">
+          {% for it in o.items %}
+            <div>• {{ it.product_name }} — {{ it.quantity }} x {{ "{:,}".format(it.price|int).replace(",", " ") }} so'm</div>
+          {% endfor %}
+        </div>
+        <div class="order-total">Jami: {{ "{:,}".format(o.total_price|int).replace(",", " ") }} so'm</div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state">Bu bo'yicha buyurtmalar topilmadi.</div>
+  {% endif %}
+{% endblock %}

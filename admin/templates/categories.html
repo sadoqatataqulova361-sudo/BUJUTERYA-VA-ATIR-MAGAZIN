@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Kategoriyalar — Admin panel{% endblock %}
+{% block content %}
+  <div class="page-header">
+    <div>
+      <h1>Kategoriyalar</h1>
+      <p>Botdagi bo'limlar shu yerdan boshqariladi</p>
+    </div>
+  </div>
+
+  <div class="form-card" style="margin-bottom: 32px;">
+    <form method="post">
+      <div class="field-row">
+        <div class="field" style="flex: 0 0 70px;">
+          <label for="emoji">Emoji</label>
+          <input type="text" id="emoji" name="emoji" value="✨" maxlength="4">
+        </div>
+        <div class="field" style="flex: 2;">
+          <label for="name">Nomi</label>
+          <input type="text" id="name" name="name" required placeholder="masalan: Uzuklar">
+        </div>
+        <div class="field" style="flex: 0 0 100px;">
+          <label for="order">Tartib</label>
+          <input type="number" id="order" name="order" value="0">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">+ Qo'shish</button>
+    </form>
+  </div>
+
+  {% if categories %}
+    <div>
+      {% for c in categories %}
+        <div class="cat-row">
+          <div class="cat-emoji">{{ c.emoji }}</div>
+          <div class="cat-name">{{ c.name }}</div>
+          <span class="badge {{ 'on' if c.is_active else 'off' }}">{{ 'faol' if c.is_active else 'yashirin' }}</span>
+          <form method="post" action="{{ url_for('category_toggle', cat_id=c.id) }}">
+            <button type="submit" class="btn btn-sm">{{ 'Yashirish' if c.is_active else 'Ko\'rsatish' }}</button>
+          </form>
+          <form method="post" action="{{ url_for('category_delete', cat_id=c.id) }}" onsubmit="return confirm('Kategoriya va undagi barcha mahsulotlar o\'chadi. Davom etasizmi?');">
+            <button type="submit" class="btn btn-sm btn-danger">O'chirish</button>
+          </form>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">Hozircha kategoriya yo'q. Yuqoridagi forma orqali birinchisini qo'shing.</div>
+  {% endif %}
+{% endblock %}

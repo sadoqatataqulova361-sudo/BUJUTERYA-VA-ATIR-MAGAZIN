@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Mahsulotni tahrirlash' if product else 'Yangi mahsulot' }} — Admin panel{% endblock %}
+{% block content %}
+  <div class="page-header">
+    <div>
+      <h1>{{ 'Mahsulotni tahrirlash' if product else 'Yangi mahsulot' }}</h1>
+      <p>{{ 'O\'zgarishlarni kiriting va saqlang' if product else 'Katalogga yangi mahsulot qo\'shing' }}</p>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <form method="post" enctype="multipart/form-data">
+
+      {% if product and product.photo_path %}
+        <div class="current-photo">
+          <img src="{{ url_for('uploaded_file', filename=product.photo_path.split('/')[-1]) }}" alt="">
+        </div>
+      {% endif %}
+
+      <div class="field">
+        <label for="photo">Rasm {{ '(yangisini yuklasangiz, eskisi almashadi)' if product else '' }}</label>
+        <input type="file" id="photo" name="photo" accept=".jpg,.jpeg,.png,.webp">
+      </div>
+
+      <div class="field">
+        <label for="category_id">Kategoriya</label>
+        <select id="category_id" name="category_id" required>
+          {% for c in categories %}
+            <option value="{{ c.id }}" {{ 'selected' if product and product.category_id == c.id else '' }}>{{ c.emoji }} {{ c.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="name">Mahsulot nomi</label>
+        <input type="text" id="name" name="name" required value="{{ product.name if product else '' }}">
+      </div>
+
+      <div class="field">
+        <label for="description">Tavsif</label>
+        <textarea id="description" name="description">{{ product.description if product else '' }}</textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="price">Joriy narx (so'm)</label>
+          <input type="number" step="1000" id="price" name="price" required value="{{ product.price|int if product else '' }}">
+        </div>
+        <div class="field">
+          <label for="old_price">Eski narx (chegirma bo'lsa, ixtiyoriy)</label>
+          <input type="number" step="1000" id="old_price" name="old_price" value="{{ product.old_price|int if product and product.old_price else '' }}">
+        </div>
+      </div>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="in_stock" name="in_stock" {{ 'checked' if not product or product.in_stock else '' }}>
+        <label for="in_stock">Sotuvda bor</label>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="is_active" name="is_active" {{ 'checked' if not product or product.is_active else '' }}>
+        <label for="is_active">Mijozlarga ko'rinsin (bot katalogida chiqadi)</label>
+      </div>
+
+      <button type="submit" class="btn btn-primary">{{ 'Saqlash' if product else 'Qo\'shish' }}</button>
+      <a href="{{ url_for('products') }}" class="btn">Bekor qilish</a>
+    </form>
+  </div>
+{% endblock %}

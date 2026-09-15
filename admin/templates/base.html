@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Admin panel{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div>
+        <p class="brand">Butik&nbsp;Admin</p>
+        <p class="brand-sub">Zargarlik &amp; atir do'koni</p>
+      </div>
+      <ul class="nav-list">
+        <li><a href="{{ url_for('products') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('product') else '' }}">Mahsulotlar</a></li>
+        <li><a href="{{ url_for('categories') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('categor') else '' }}">Kategoriyalar</a></li>
+        <li><a href="{{ url_for('orders') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('order') else '' }}">Buyurtmalar</a></li>
+      </ul>
+      <div class="sidebar-footer">
+        {{ session.get('admin_username', '') }}<br>
+        <a href="{{ url_for('logout') }}">Chiqish</a>
+      </div>
+    </aside>
+    <main class="main">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

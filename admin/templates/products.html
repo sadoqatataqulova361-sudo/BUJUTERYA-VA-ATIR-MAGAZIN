@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Mahsulotlar — Admin panel{% endblock %}
+{% block content %}
+  <div class="page-header">
+    <div>
+      <h1>Mahsulotlar</h1>
+      <p>{{ products|length }} ta mahsulot bazada</p>
+    </div>
+    <a href="{{ url_for('product_new') }}" class="btn btn-primary">+ Yangi mahsulot</a>
+  </div>
+
+  {% if products %}
+    <div>
+      {% for p in products %}
+        <div class="product-row">
+          {% if p.photo_path %}
+            <img class="thumb" src="{{ url_for('uploaded_file', filename=p.photo_path.split('/')[-1]) }}" alt="">
+          {% else %}
+            <div class="thumb-empty"></div>
+          {% endif %}
+          <div>
+            <div class="p-name">{{ p.name }}</div>
+            <div class="p-cat">{{ categories[p.category_id].name if p.category_id in categories else '—' }}</div>
+          </div>
+          <div class="price-block">
+            {% if p.has_discount %}
+              <div class="price-old">{{ "{:,}".format(p.old_price|int).replace(",", " ") }} so'm</div>
+              <div class="price-new discount">{{ "{:,}".format(p.price|int).replace(",", " ") }} so'm</div>
+            {% else %}
+              <div class="price-new">{{ "{:,}".format(p.price|int).replace(",", " ") }} so'm</div>
+            {% endif %}
+          </div>
+          <div>
+            <span class="badge {{ 'on' if p.is_active else 'off' }}">{{ 'faol' if p.is_active else 'yashirin' }}</span>
+            {% if not p.in_stock %}<span class="badge off">tugagan</span>{% endif %}
+          </div>
+          <div class="row-actions">
+            <a class="btn btn-sm" href="{{ url_for('product_edit', product_id=p.id) }}">Tahrirlash</a>
+            <form method="post" action="{{ url_for('product_delete', product_id=p.id) }}" onsubmit="return confirm('Mahsulotni o\'chirishni tasdiqlaysizmi?');">
+              <button type="submit" class="btn btn-sm btn-danger">O'chirish</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      Hozircha mahsulot yo'q. <a href="{{ url_for('product_new') }}" style="color: var(--gold-deep); font-weight:600;">Birinchi mahsulotni qo'shing →</a>
+    </div>
+  {% endif %}
+{% endblock %}
